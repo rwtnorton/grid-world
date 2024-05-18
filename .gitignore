@@ -1,0 +1,8 @@
+.idea/
+.coverage
+.pytest_cache/
+build/
+gridworld.egg-info/
+.venv/
+.tox/
+*.sw[op]

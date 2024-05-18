@@ -4,6 +4,10 @@
 
 ## Usage
 
+```
+$ source .venv/bin/activate
+```
+
 ## Description
 
 Fun toy problem to demonstrate competence with Python ecosystem as
