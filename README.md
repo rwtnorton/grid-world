@@ -4,14 +4,68 @@
 
 ## Usage
 
+### Initialize
+
 ```
+$ python3 -m venv .venv
 $ source .venv/bin/activate
+$ ./scripts/initialize
+```
+
+### Build
+
+```
+$ ./scripts/build
+```
+
+### Lint
+
+Uses `flake8`.
+
+```
+$ ./scripts/lint
+```
+
+### Run code formatter
+
+Uses [black](https://github.com/psf/black).
+
+```
+$ ./scripts/fmt
+```
+
+### Run tests locally
+
+```
+$ ./scripts/run_tests
+```
+
+### Run tests via tox
+
+```
+$ ./scripts/run_tests_with_tox
+```
+
+### Type-check via mypy
+
+```
+$ ./scripts/run_mypy
+```
+
+### Update requirements with pinned deps
+
+(Really only should matter during development.)
+
+```
+$ ./scripts/pin_dep_versions
 ```
 
 ## Description
 
 Fun toy problem to demonstrate competence with Python ecosystem as
 part of an interview coding test.
+
+This project addresses Options 2 and 3.
 
 ### Problem
 
