@@ -26,7 +26,7 @@ class Terrain(enum.IntEnum):
         raise ValueError(f"unknown terrain type: {self!r}")
 
     @classmethod
-    def from_str(cls, s: str) -> 'Terrain':
+    def from_str(cls, s: str) -> "Terrain":
         match s:
             case ".":
                 return Terrain.BLANK

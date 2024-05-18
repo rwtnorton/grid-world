@@ -3,4 +3,4 @@ set -eu
 
 cd "$(dirname $0)/.."
 
-exec .venv/bin/black "$@" gridworld/
+exec .venv/bin/black --line-length 79 "$@" gridworld/

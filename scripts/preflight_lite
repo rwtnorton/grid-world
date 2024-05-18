@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -eu
+
+cd "$(dirname $0)/.."
+
+./scripts/lint
+./scripts/fmt
+./scripts/run_mypy
+./scripts/run_tests
