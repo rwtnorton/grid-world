@@ -20,4 +20,4 @@ license = {text = "MIT License"}
 readme = "README.md"
 
 [project.scripts]
-gridworld-cli = "gridworld:main_cli"
+gridworld-cli = "gridworld.main:main"
