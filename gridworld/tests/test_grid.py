@@ -215,3 +215,11 @@ def test_grid_iter():
     assert next(it) == Terrain.MUD
     with pytest.raises(StopIteration):
         next(it)
+
+
+def test_grid_random():
+    dims = (2, 3)
+    grid = Grid.random(dims)
+    assert grid.dimensions == dims
+    terrains = set(Terrain)
+    assert all(Terrain(c) in terrains for c in grid.cells)
