@@ -13,7 +13,7 @@ class Terrain(enum.IntEnum):
     LAVA = enum.auto()
     MUD = enum.auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         match self:
             case Terrain.BLANK:
                 return "."
@@ -26,7 +26,7 @@ class Terrain(enum.IntEnum):
         raise ValueError(f"unknown terrain type: {self!r}")
 
     @classmethod
-    def from_str(cls, s):
+    def from_str(cls, s: str) -> 'Terrain':
         match s:
             case ".":
                 return Terrain.BLANK
