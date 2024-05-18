@@ -6,3 +6,4 @@ gridworld.egg-info/
 .venv/
 .tox/
 *.sw[op]
+__pycache__
