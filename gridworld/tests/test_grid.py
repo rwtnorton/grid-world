@@ -206,6 +206,7 @@ def test_grid_iter():
         Terrain.MUD,
     ]
     grid = Grid((2, 3), cells)
+    # via explicit next()
     it = iter(grid)
     assert next(it) == Terrain.BLANK
     assert next(it) == Terrain.LAVA
@@ -215,6 +216,8 @@ def test_grid_iter():
     assert next(it) == Terrain.MUD
     with pytest.raises(StopIteration):
         next(it)
+    # via implicit next()
+    assert list(grid) == [Terrain(c) for c in cells]
 
 
 def test_grid_random():
