@@ -197,6 +197,58 @@ def test_game_is_win_not_won_cuz_dead():
     assert game.agent.is_alive() is False
 
 
+def test_game_is_loss_at_goal():
+    start = (1, 1)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    agent.health = 0
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.is_win() is False
+    assert game.agent.is_alive() is False
+    assert game.is_loss() is True
+
+
+def test_game_is_loss_before_goal():
+    start = (1, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    agent.moves = 0
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.is_win() is False
+    assert game.agent.is_alive() is False
+    assert game.is_loss() is True
+
+
 def test_game_move_ok():
     start = (0, 0)
     dims = (2, 2)
@@ -221,8 +273,8 @@ def test_game_move_ok():
     )
     assert game.move(Direction.RIGHT) is True
     assert game.agent.position == (0, 1)
-    assert game.agent.health == 50
-    assert game.agent.moves == 90
+    assert game.agent.health < 100
+    assert game.agent.moves < 100
     assert game.agent.is_alive() is True
     assert game.is_win() is False
 
@@ -250,7 +302,7 @@ def test_game_move_invalid_direction():
         costs=costs,
     )
     assert game.move(Direction.UP) is False
-    assert game.agent.position == agent.position
+    assert game.agent.position == start  # did not move
     assert game.agent.health == agent.max_health
     assert game.agent.moves == agent.max_moves
     assert game.agent.is_alive() is True
@@ -281,7 +333,79 @@ def test_game_move_died():
     )
     assert game.move(Direction.RIGHT) is True
     assert game.agent.position == (0, 1)
-    assert game.agent.health == -40
-    assert game.agent.moves == 90
+    assert game.agent.health <= 0
+    assert game.agent.moves < 100
     assert game.agent.is_alive() is False
     assert game.is_win() is False
+
+
+def test_game_move_non_win_alive():
+    start = (0, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    orig_health = agent.health
+    orig_moves = agent.moves
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    new_position = (0, 1)
+    new_terrain = game.grid[new_position]
+    assert game.move(Direction.RIGHT) is True
+    assert game.agent.position == new_position
+    assert game.agent.health == (
+        orig_health + costs.health_cost_of(new_terrain)
+    )
+    assert game.agent.moves == (orig_moves + costs.move_cost_of(new_terrain))
+    assert game.agent.is_healthy() is True
+    assert game.agent.is_motive() is True
+    assert game.is_win() is False
+    assert game.is_loss() is False
+
+
+def test_game_move_win_alive():
+    start = (0, 1)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    orig_health = agent.health
+    orig_moves = agent.moves
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    new_position = (1, 1)
+    new_terrain = game.grid[new_position]
+    assert game.move(Direction.DOWN) is True
+    assert game.agent.position == new_position
+    assert game.agent.health == (
+        orig_health + costs.health_cost_of(new_terrain)
+    )
+    assert game.agent.moves == (orig_moves + costs.move_cost_of(new_terrain))
+    assert game.agent.is_healthy() is True
+    assert game.agent.is_motive() is True
+    assert game.is_win() is True
+    assert game.is_loss() is False

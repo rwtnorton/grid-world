@@ -63,6 +63,11 @@ class Game:
             self.agent.position == self.goal_position and self.agent.is_alive()
         )
 
+    def is_loss(self) -> bool:
+        # Independent of agent position; if dead, even on the goal, then
+        # it's still a loss.
+        return not self.agent.is_alive()
+
     def move(self, direction: Direction) -> bool:
         dims = self.grid.dimensions
         pos = self.agent.position
@@ -70,7 +75,7 @@ class Game:
         new_pos = translate_along(position=pos, direction=direction)
         if new_pos not in hood:
             return False
-        terrain = self.grid[*new_pos]
+        terrain = self.grid[new_pos]
         self.agent.health += self.costs.health_cost_of(terrain)
         self.agent.moves += self.costs.move_cost_of(terrain)
         self.agent.position = new_pos
