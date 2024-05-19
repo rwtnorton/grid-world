@@ -37,3 +37,15 @@ class Terrain(enum.IntEnum):
             case "#":
                 return Terrain.MUD
         raise ValueError(f"unknown terrain str type: {s!r}")
+
+    @property
+    def abbr(self) -> str:
+        return self.name.lower()
+
+    @classmethod
+    def from_abbr(cls, s: str) -> "Terrain":
+        lookup = {t.abbr: t for t in Terrain}
+        v = lookup.get(s)
+        if v is None:
+            raise ValueError(f"unknown terrain abbr: {s!r}")
+        return v

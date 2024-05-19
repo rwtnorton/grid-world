@@ -24,3 +24,20 @@ def test_terrain_from_str():
     with pytest.raises(ValueError) as err:
         Terrain.from_str(":-)")
     assert "unknown terrain" in str(err.value)
+
+
+def test_terrain_abbr():
+    assert Terrain.BLANK.abbr == "blank"
+    assert Terrain.SPEEDER.abbr == "speeder"
+    assert Terrain.LAVA.abbr == "lava"
+    assert Terrain.MUD.abbr == "mud"
+
+
+def test_terrain_from_abbr():
+    assert Terrain.from_abbr("blank") == Terrain.BLANK
+    assert Terrain.from_abbr("speeder") == Terrain.SPEEDER
+    assert Terrain.from_abbr("lava") == Terrain.LAVA
+    assert Terrain.from_abbr("mud") == Terrain.MUD
+    with pytest.raises(ValueError) as err:
+        Terrain.from_abbr("river")
+    assert "unknown terrain abbr: 'river'" in str(err.value)
