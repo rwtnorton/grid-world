@@ -38,3 +38,14 @@ def translate_along(
     if direction == Direction.RIGHT:
         return r, c + 1
     raise ValueError(f"invalid direction: {direction!r}")
+
+
+def valid_directions_from(
+    *, dimensions: Tuple[int, int], position: Tuple[int, int]
+) -> Set[Direction]:
+    hood = neighborhood(dimensions=dimensions, position=position)
+    dirs = [Direction(d) for d in Direction]  # to pacify mypy
+    dir_pos = [
+        (d, translate_along(position=position, direction=d)) for d in dirs
+    ]
+    return {d for d, p in dir_pos if p in hood}
