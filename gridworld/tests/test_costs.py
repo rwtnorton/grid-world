@@ -44,7 +44,7 @@ def test_costs_init_bad_health_args():
     assert "missing health terrains: lava, mud" in str(bad_h_err.value)
 
 
-def test_costs_init_bad_health_args():
+def test_costs_init_bad_move_args():
     hmap = {
         Terrain.BLANK: -1,
         Terrain.SPEEDER: -2,
