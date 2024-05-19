@@ -2,7 +2,6 @@ import json
 from dataclasses import dataclass
 from typing import Tuple
 
-from gridworld import positions
 from gridworld.direction import Direction
 from gridworld.positions import is_valid_at, translate_along, neighborhood
 from gridworld.agent import Agent
