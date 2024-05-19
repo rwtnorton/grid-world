@@ -1,4 +1,5 @@
-from gridworld.positions import neighborhood, neighbors
+from gridworld.positions import neighborhood, neighbors, translate_along
+from gridworld.direction import Direction
 
 
 def test_neighors():
@@ -22,3 +23,11 @@ def test_neighborhood():
         (0, 1),
         (1, 0),
     }
+
+
+def test_translate_along():
+    pos = (1, 1)
+    assert translate_along(position=pos, direction=Direction.UP) == (0, 1)
+    assert translate_along(position=pos, direction=Direction.DOWN) == (2, 1)
+    assert translate_along(position=pos, direction=Direction.LEFT) == (1, 0)
+    assert translate_along(position=pos, direction=Direction.RIGHT) == (1, 2)
