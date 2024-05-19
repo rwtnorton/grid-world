@@ -43,6 +43,7 @@ class Game:
     @classmethod
     def from_json_str(cls, json_str: str) -> "Game":
         json_data = json.loads(json_str)
+        # TODO: this is a little kludgy but gets the job done.
         grid = Grid.from_json_str(json.dumps(json_data["grid"]))
         agent = Agent.from_json_str(json.dumps(json_data["agent"]))
         costs = Costs.from_json_str(json.dumps(json_data["costs"]))
@@ -54,4 +55,9 @@ class Game:
             costs=costs,
             start_position=(start_pos[0], start_pos[1]),
             goal_position=(goal_pos[0], goal_pos[1]),
+        )
+
+    def is_win(self) -> bool:
+        return (
+            self.agent.position == self.goal_position and self.agent.is_alive()
         )

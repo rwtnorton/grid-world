@@ -122,3 +122,75 @@ def test_game_from_json_str():
         costs=costs,
     )
     assert given == game
+
+
+def test_game_is_win_won():
+    start = (1, 1)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.is_win() is True
+
+
+def test_game_is_win_not_won_but_alive():
+    start = (0, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.is_win() is False
+    assert game.agent.is_alive() is True
+
+
+def test_game_is_win_not_won_cuz_dead():
+    start = (1, 1)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    agent.health = 0
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.is_win() is False
+    assert game.agent.is_alive() is False
