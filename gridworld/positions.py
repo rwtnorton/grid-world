@@ -13,3 +13,11 @@ def neighborhood(
     return {
         (r, c) for (r, c) in neighbors(position) if 0 <= r < m and 0 <= c < n
     }
+
+
+def is_valid_at(
+    *, dimensions: Tuple[int, int], position: Tuple[int, int]
+) -> bool:
+    m, n = dimensions
+    r, c = position
+    return 0 <= r < m and 0 <= c < n
