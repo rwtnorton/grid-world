@@ -1,5 +1,6 @@
 from gridworld.agent import Agent
 from gridworld.costs import Costs
+from gridworld.direction import Direction
 from gridworld.game import Game
 from gridworld.grid import Grid
 from gridworld.terrain import Terrain
@@ -194,3 +195,93 @@ def test_game_is_win_not_won_cuz_dead():
     )
     assert game.is_win() is False
     assert game.agent.is_alive() is False
+
+
+def test_game_move_ok():
+    start = (0, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(
+        position=start, health=100, max_health=100, moves=100, max_moves=100
+    )
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.move(Direction.RIGHT) is True
+    assert game.agent.position == (0, 1)
+    assert game.agent.health == 50
+    assert game.agent.moves == 90
+    assert game.agent.is_alive() is True
+    assert game.is_win() is False
+
+
+def test_game_move_invalid_direction():
+    start = (0, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(
+        position=start, health=100, max_health=100, moves=100, max_moves=100
+    )
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.move(Direction.UP) is False
+    assert game.agent.position == agent.position
+    assert game.agent.health == agent.max_health
+    assert game.agent.moves == agent.max_moves
+    assert game.agent.is_alive() is True
+    assert game.is_win() is False
+
+
+def test_game_move_died():
+    start = (0, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(
+        position=start, health=10, max_health=100, moves=100, max_moves=100
+    )
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.move(Direction.RIGHT) is True
+    assert game.agent.position == (0, 1)
+    assert game.agent.health == -40
+    assert game.agent.moves == 90
+    assert game.agent.is_alive() is False
+    assert game.is_win() is False

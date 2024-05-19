@@ -2,7 +2,9 @@ import json
 from dataclasses import dataclass
 from typing import Tuple
 
-from gridworld.positions import is_valid_at
+from gridworld import positions
+from gridworld.direction import Direction
+from gridworld.positions import is_valid_at, translate_along, neighborhood
 from gridworld.agent import Agent
 from gridworld.costs import Costs
 from gridworld.grid import Grid
@@ -61,3 +63,16 @@ class Game:
         return (
             self.agent.position == self.goal_position and self.agent.is_alive()
         )
+
+    def move(self, direction: Direction) -> bool:
+        dims = self.grid.dimensions
+        pos = self.agent.position
+        hood = neighborhood(dimensions=dims, position=pos)
+        new_pos = translate_along(position=pos, direction=direction)
+        if new_pos not in hood:
+            return False
+        terrain = self.grid[*new_pos]
+        self.agent.health += self.costs.health_cost_of(terrain)
+        self.agent.moves += self.costs.move_cost_of(terrain)
+        self.agent.position = new_pos
+        return True
