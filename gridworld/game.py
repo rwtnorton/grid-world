@@ -41,7 +41,7 @@ class Game:
         )
 
     @classmethod
-    def from_json(cls, json_str: str) -> "Game":
+    def from_json_str(cls, json_str: str) -> "Game":
         json_data = json.loads(json_str)
         grid = Grid.from_json_str(json.dumps(json_data["grid"]))
         agent = Agent.from_json_str(json.dumps(json_data["agent"]))
