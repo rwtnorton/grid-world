@@ -7,7 +7,7 @@ def neighbors(position: Tuple[int, int]) -> Set[Tuple[int, int]]:
 
 
 def neighborhood(
-    dimensions: Tuple[int, int], position: Tuple[int, int]
+    *, dimensions: Tuple[int, int], position: Tuple[int, int]
 ) -> Set[Tuple[int, int]]:
     m, n = dimensions
     return {
