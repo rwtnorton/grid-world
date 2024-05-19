@@ -1,3 +1,5 @@
+import copy
+
 from gridworld.agent import Agent
 from gridworld.costs import Costs
 from gridworld.direction import Direction
@@ -409,3 +411,59 @@ def test_game_move_win_alive():
     assert game.agent.is_motive() is True
     assert game.is_win() is True
     assert game.is_loss() is False
+
+
+def test_game_speculative_move_bad_move():
+    start = (0, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    double_agent = copy.deepcopy(agent)
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    assert game.speculative_move(Direction.UP) is None
+    assert agent == double_agent  # no change to game's agent
+
+
+def test_game_speculative_move_good_move():
+    start = (0, 0)
+    dims = (2, 2)
+    goal = (1, 1)
+    cells = [
+        Terrain.BLANK,
+        Terrain.LAVA,
+        Terrain.SPEEDER,
+        Terrain.MUD,
+    ]
+    grid = Grid(dimensions=dims, cells=cells)
+    costs = Costs()
+    agent = Agent(position=start)
+    double_agent = copy.deepcopy(agent)
+    game = Game(
+        grid=grid,
+        start_position=start,
+        goal_position=goal,
+        agent=agent,
+        costs=costs,
+    )
+    moved_agent = game.speculative_move(Direction.RIGHT)
+    assert agent == double_agent  # no change to game's agent
+    assert isinstance(moved_agent, Agent) is True
+    assert moved_agent != agent
+    assert moved_agent.position == (0, 1)
+    # Moved into lava, so health and moves should have both decreased.
+    assert moved_agent.health < agent.health
+    assert moved_agent.moves < agent.moves

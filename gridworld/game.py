@@ -1,6 +1,7 @@
+import copy
 import json
 from dataclasses import dataclass
-from typing import Tuple
+from typing import Tuple, Optional
 
 from gridworld.direction import Direction
 from gridworld.positions import is_valid_at, translate_along, neighborhood
@@ -69,6 +70,12 @@ class Game:
         return not self.agent.is_alive()
 
     def move(self, direction: Direction) -> bool:
+        """
+        Performs a move of the game agent if possible, adjusting
+        agent health, moves, and position accordingly.
+
+        Returns True if the move is possible, False otherwise.
+        """
         dims = self.grid.dimensions
         pos = self.agent.position
         hood = neighborhood(dimensions=dims, position=pos)
@@ -80,3 +87,23 @@ class Game:
         self.agent.moves += self.costs.move_cost_of(terrain)
         self.agent.position = new_pos
         return True
+
+    def speculative_move(self, direction: Direction) -> Optional[Agent]:
+        """
+        Returns a copy of Agent with consequences of moving in direction, or
+        None if Agent cannot move that direction.
+
+        Does not mutate any component of this Game.
+        """
+        dims = self.grid.dimensions
+        pos = self.agent.position
+        hood = neighborhood(dimensions=dims, position=pos)
+        new_pos = translate_along(position=pos, direction=direction)
+        result = copy.deepcopy(self.agent)
+        if new_pos not in hood:
+            return None
+        terrain = self.grid[new_pos]
+        result.health += self.costs.health_cost_of(terrain)
+        result.moves += self.costs.move_cost_of(terrain)
+        result.position = new_pos
+        return result
