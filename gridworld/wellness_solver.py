@@ -160,7 +160,7 @@ class WellnessSolver:
             new_agent = self.game.speculative_move(from_dir, trav_ag.agent)
             if debug:
                 print(f" - new_agent={new_agent}")
-            if new_agent is None:
+            if new_agent is None or new_agent.is_dead():
                 continue
             curr_best = self._best_states[new_pos[0]][new_pos[1]]
             if (
