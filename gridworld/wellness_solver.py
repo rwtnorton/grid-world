@@ -4,6 +4,7 @@ from collections import deque
 
 # import heapq
 from dataclasses import dataclass, field
+from functools import cache
 from typing import Tuple, List, Optional, Set
 
 import math
@@ -17,6 +18,7 @@ from gridworld.positions import valid_directions_from, translate_along
 from gridworld.terrain import Terrain
 
 
+@cache
 def wellness_metric(
     *, health: int, max_health: int, moves: int, max_moves: int
 ) -> float:
@@ -37,6 +39,7 @@ def wellness_metric(
     return (health * moves) / (max_health * max_moves)
 
 
+@cache
 def distance_metric(position: Tuple[int, int], goal: Tuple[int, int]) -> float:
     """
     Returns metric in (0, 1] based on how close position is to goal.

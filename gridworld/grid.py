@@ -1,4 +1,3 @@
-# from collections.abc import Sequence
 import json
 from array import array
 from dataclasses import dataclass

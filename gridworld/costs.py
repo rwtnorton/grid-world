@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass, field
+from functools import cached_property
 from types import MappingProxyType
 from typing import Mapping
 
@@ -48,12 +49,14 @@ class Costs:
             missing = sorted([t.name.lower() for t in missing_move_terrains])
             raise ValueError(f"missing move terrains: {', '.join(missing)}")
 
+    @cached_property
     def health_cost_of(self, terrain: Terrain) -> int:
         cost = self.health_costs.get(terrain)
         if cost is None:
             raise ValueError(f"unknown terrain: {terrain!r}")
         return cost
 
+    @cached_property
     def move_cost_of(self, terrain: Terrain) -> int:
         cost = self.move_costs.get(terrain)
         if cost is None:

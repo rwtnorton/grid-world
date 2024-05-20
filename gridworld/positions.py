@@ -1,13 +1,16 @@
+from functools import cache
 from typing import Tuple, Set
 
 from gridworld.direction import Direction
 
 
+@cache
 def neighbors(position: Tuple[int, int]) -> Set[Tuple[int, int]]:
     r, c = position
     return {(r - 1, c + 0), (r + 0, c - 1), (r + 0, c + 1), (r + 1, c + 0)}
 
 
+@cache
 def neighborhood(
     *, dimensions: Tuple[int, int], position: Tuple[int, int]
 ) -> Set[Tuple[int, int]]:
@@ -17,6 +20,7 @@ def neighborhood(
     }
 
 
+@cache
 def is_valid_at(
     *, dimensions: Tuple[int, int], position: Tuple[int, int]
 ) -> bool:
@@ -25,6 +29,7 @@ def is_valid_at(
     return 0 <= r < m and 0 <= c < n
 
 
+@cache
 def translate_along(
     *, direction: Direction, position: Tuple[int, int]
 ) -> Tuple[int, int]:
@@ -40,6 +45,7 @@ def translate_along(
     raise ValueError(f"invalid direction: {direction!r}")
 
 
+@cache
 def valid_directions_from(
     *, dimensions: Tuple[int, int], position: Tuple[int, int]
 ) -> Set[Direction]:
