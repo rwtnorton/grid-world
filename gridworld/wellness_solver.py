@@ -1,4 +1,5 @@
 import time
+import typing
 from copy import deepcopy
 from collections import deque
 
@@ -15,7 +16,6 @@ from gridworld.direction import Direction
 from gridworld.game import Game
 from gridworld.grid import Grid
 from gridworld.positions import valid_directions_from, translate_along
-from gridworld.terrain import Terrain
 
 
 @cache
@@ -146,7 +146,9 @@ class WellnessSolver:
             (d, translate_along(position=pos, direction=d)) for d in dirs
         ]
         self._best_states[pos[0]][pos[1]] = ta
-        queue = deque()
+        queue: typing.Deque[
+            Tuple[Direction, Tuple[int, int], TravelingAgent]
+        ] = deque()
         for d, p in dir_pos_pairs:
             entry = (d, p, deepcopy(ta))
             queue.append(entry)
