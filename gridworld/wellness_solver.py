@@ -1,15 +1,19 @@
+import time
+from copy import deepcopy
 from collections import deque
-import heapq
+
+# import heapq
 from dataclasses import dataclass, field
-from typing import Tuple, Mapping, List, Optional
+from typing import Tuple, List, Optional, Set
 
 import math
 
 from gridworld.agent import Agent
 from gridworld.costs import Costs
+from gridworld.direction import Direction
 from gridworld.game import Game
 from gridworld.grid import Grid
-from gridworld.positions import valid_directions_from
+from gridworld.positions import valid_directions_from, translate_along
 from gridworld.terrain import Terrain
 
 
@@ -82,19 +86,20 @@ class TravelingAgent:
         return (w * 0.5) + (d * 0.5)
 
 
-def _some_game():
+def _some_game(dims=(2, 3)):
     start = (0, 0)
-    dims = (2, 3)
-    goal = (1, 2)
-    cells = [
-        Terrain.BLANK,
-        Terrain.LAVA,
-        Terrain.SPEEDER,
-        Terrain.MUD,
-        Terrain.SPEEDER,
-        Terrain.MUD,
-    ]
-    grid = Grid(dimensions=dims, cells=cells)
+    m, n = dims
+    goal = (m - 1, n - 1)
+    # cells = [
+    #     Terrain.BLANK,
+    #     Terrain.LAVA,
+    #     Terrain.SPEEDER,
+    #     Terrain.MUD,
+    #     Terrain.SPEEDER,
+    #     Terrain.MUD,
+    # ]
+    # grid = Grid(dimensions=dims, cells=cells)
+    grid = Grid.random(dims)
     costs = Costs()
     agent = Agent(position=start)
     game = Game(
@@ -126,3 +131,66 @@ class WellnessSolver:
             f"dims: {m} x {n},"
             f" states: {len(self._best_states)} x {len(self._best_states[0])}"
         )
+
+    def solve(self, debug: bool = False) -> Optional[TravelingAgent]:
+        ag = deepcopy(self.game.agent)
+        pos = ag.position
+        ta = TravelingAgent(agent=ag, path=[pos])
+        seen: Set[Tuple[Direction, Tuple[int, int]]] = set()
+        dims = self.game.grid.dimensions
+        dirs = valid_directions_from(position=pos, dimensions=dims)
+        dir_pos_pairs = [
+            (d, translate_along(position=pos, direction=d)) for d in dirs
+        ]
+        self._best_states[pos[0]][pos[1]] = ta
+        queue = deque()
+        for d, p in dir_pos_pairs:
+            entry = (d, p, deepcopy(ta))
+            queue.append(entry)
+        t0 = time.perf_counter()
+        while queue:
+            from_dir, new_pos, trav_ag = queue.popleft()
+            if debug:
+                print(
+                    f"from_dir={from_dir}"
+                    f", new_pos={new_pos}"
+                    f", terr={self.game.grid[new_pos]}"
+                    f", trav_ag={trav_ag}"
+                )
+            new_agent = self.game.speculative_move(from_dir, trav_ag.agent)
+            if debug:
+                print(f" - new_agent={new_agent}")
+            if new_agent is None:
+                continue
+            curr_best = self._best_states[new_pos[0]][new_pos[1]]
+            if (
+                curr_best is not None
+                and curr_best.agent.health > new_agent.health
+                and curr_best.agent.moves > new_agent.moves
+            ):
+                # If what we already have is clearly better, no need to go
+                # down this road any further.
+                continue
+            new_path = trav_ag.path[:]
+            new_path.append(new_pos)
+            new_ta = TravelingAgent(agent=new_agent, path=new_path)
+            if curr_best is None or curr_best.wellness < new_ta.wellness:
+                self._best_states[new_pos[0]][new_pos[1]] = new_ta
+            elif curr_best.wellness == new_ta.wellness and len(ta.path) < len(
+                curr_best.path
+            ):
+                self._best_states[new_pos[0]][new_pos[1]] = new_ta
+            seen.add((from_dir, new_pos))
+            dirs = valid_directions_from(position=new_pos, dimensions=dims)
+            dir_pos_pairs = [
+                (d, translate_along(position=new_pos, direction=d))
+                for d in dirs
+            ]
+            for d, p in dir_pos_pairs:
+                if not (d, p) in seen:
+                    queue.append((d, p, new_ta))
+        t1 = time.perf_counter()
+        dt = t1 - t0
+        print(f"elapsed time: {dt:0.4f}")
+        goal_r, goal_c = self.game.goal_position
+        return self._best_states[goal_r][goal_c]

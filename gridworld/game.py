@@ -88,18 +88,21 @@ class Game:
         self.agent.position = new_pos
         return True
 
-    def speculative_move(self, direction: Direction) -> Optional[Agent]:
+    def speculative_move(
+        self, direction: Direction, agent: Optional[Agent] = None
+    ) -> Optional[Agent]:
         """
         Returns a copy of Agent with consequences of moving in direction, or
         None if Agent cannot move that direction.
 
         Does not mutate any component of this Game.
         """
+        agent = agent or self.agent
         dims = self.grid.dimensions
-        pos = self.agent.position
+        pos = agent.position
         hood = neighborhood(dimensions=dims, position=pos)
         new_pos = translate_along(position=pos, direction=direction)
-        result = copy.deepcopy(self.agent)
+        result = copy.deepcopy(agent)
         if new_pos not in hood:
             return None
         terrain = self.grid[new_pos]
