@@ -1,4 +1,3 @@
-import sqlite3
 from typing import Iterable, Tuple, Optional
 
 from gridworld.game import Game
