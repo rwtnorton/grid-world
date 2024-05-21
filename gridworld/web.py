@@ -36,26 +36,9 @@ async def health():
     return {"status": "ok"}
 
 
-#
-# Note:  Much of the JSON awkwardness of my approach below comes down to how
-#        much FastAPI expects users to lean into pydantic models, which
-#        I have avoided unless absolutely necessary.
-#        Modeling requests and responses is fine, but I very much did
-#        not want to pollute my internal models (e.g., Game) with
-#        the peculiarities of pydantic.  Core business logic should be
-#        fully modular, pluggable into web (and other) interfaces, and
-#        independent of the details of clients, IMHO.  The dependency graph
-#        should be acyclic.
-#
-#        Guess I will chalk this experience up to my first time using
-#        FastAPI in anger.
-#
-
-
 @app.get("/games")
 async def get_all_games(repo: GameRepo = Depends(get_game_repo)):
     id_game_pairs = repo.get_all_games()
-    # Kludgy
     json_str = f"""
     {{
       "games": {{
