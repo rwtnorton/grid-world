@@ -1,4 +1,5 @@
 import json
+import os
 from typing import Tuple
 
 from fastapi import FastAPI, Depends, HTTPException
@@ -12,10 +13,16 @@ from gridworld.game_repo import GameRepo
 
 app = FastAPI()
 
+db: Database | None = None
 
-# TODO: How to provide the db file name from main.py?
+
 def get_db():
-    db = Database("some_db.sqlite3")
+    db_name = os.getenv("DB_NAME", None)
+    global db
+    if db_name is None or db_name == ":memory:":
+        db = Database()
+    else:
+        db = Database(f"{db_name}.sqlite3")
     return db
 
 

@@ -116,9 +116,14 @@ def run_web_server(port: int = 8000, server_mode: ServerMode = ServerMode.DEV):
         case _:
             raise ValueError(f"unknown server mode: {server_mode!r}")
     cmd = ["fastapi", fastapi_subcmd, WEB_PATH, "--port", str(port)]
+    db_name = os.getenv("DB_NAME")
+    if db_name is None:
+        db_name = server_mode.name.lower()
+    env = os.environ.copy()
+    env["DB_NAME"] = db_name
     # print(f"web cmd: {cmd!r}")
     try:
-        result = subprocess.run(cmd)
+        result = subprocess.run(cmd, env=env)
     except KeyboardInterrupt:
         exit(0)
     exit(result.returncode)
