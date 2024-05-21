@@ -3,7 +3,6 @@ from typing import Tuple
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from gridworld import direction
 from pydantic import BaseModel
 
 from gridworld.database import Database
@@ -108,3 +107,19 @@ async def update_agent_direction(
         repo.update_game_by_id(game_id, game)
         return JSONResponse(content=json.loads(game.to_json_str()))
     return {"message": f"direction had no effect: {agent_dir.direction}"}
+
+
+@app.get("/games/{game_id}/status")
+async def get_game_status_by_id(
+    game_id: int, repo: GameRepo = Depends(get_game_repo)
+):
+    game_maybe = repo.get_game_by_id(game_id)
+    if game_maybe is None:
+        raise HTTPException(status_code=404, detail="game not found")
+    game: Game = game_maybe
+    if game.is_win():
+        return {"status": "win"}
+    elif game.is_loss():
+        return {"status": "loss"}
+    else:
+        return {"status": "ongoing"}
