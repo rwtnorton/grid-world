@@ -107,13 +107,18 @@ WEB_PATH = "gridworld/web.py"
 
 
 def run_web_server(port: int = 8000, server_mode: ServerMode = ServerMode.DEV):
-    dev_or_prod = "dev" if server_mode == ServerMode.DEV else "run"
-    cmd = ["fastapi", dev_or_prod, WEB_PATH, "--port", str(port)]
-    print(f"web cmd: {cmd!r}")
+    fastapi_subcmd = None
+    match server_mode:
+        case ServerMode.DEV:
+            fastapi_subcmd = "dev"
+        case ServerMode.PROD:
+            fastapi_subcmd = "run"
+        case _:
+            raise ValueError(f"unknown server mode: {server_mode!r}")
+    cmd = ["fastapi", fastapi_subcmd, WEB_PATH, "--port", str(port)]
+    # print(f"web cmd: {cmd!r}")
     try:
-        result = subprocess.run(
-            ["fastapi", dev_or_prod, WEB_PATH, "--port", str(port)]
-        )
+        result = subprocess.run(cmd)
     except KeyboardInterrupt:
         exit(0)
     exit(result.returncode)
