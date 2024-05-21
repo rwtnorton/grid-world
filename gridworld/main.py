@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import operator
 import os.path
 import re
 import subprocess
@@ -129,6 +130,24 @@ def run_web_server(port: int = 8000, server_mode: ServerMode = ServerMode.DEV):
     exit(result.returncode)
 
 
+def show_costs(costs: Costs) -> None:
+    terrains = sorted(
+        [(t.abbr, t) for t in costs.health_costs.keys()],
+        key=operator.itemgetter(0),
+    )
+    longest = max(len(s) for s, _t in terrains)
+    sp = "".join(repeat(" ", longest))
+    print("terrain key with costs (H=health, M=move):")
+    print(f"{sp} | S |    H |    M")
+    print(f"{sp} |---|------|------")
+    for s, t in terrains:
+        h = costs.health_cost_of(t)
+        m = costs.move_cost_of(t)
+        sym = str(t)
+        print(f"{s.rjust(longest)} | {sym} | {h:>4} | {m:>4} ")
+    print(f"{sp} ------------------")
+
+
 def run_game_loop(game: Game):
     dir_prompt = "== choose direction (u, d, l, r) and hit Enter: "
     path = [game.agent.position]
@@ -142,6 +161,7 @@ def run_game_loop(game: Game):
         )
 
     while True:
+        show_costs(game.costs)
         print(ruler(str(game.grid), game.agent.position))
         print(f"start:   {game.start_position}")
         print(f"goal:    {game.goal_position}")
@@ -212,6 +232,7 @@ def main():
     match mode:
         case Mode.SOLVE:
             g = gather_game_from_args(args)
+            show_costs(g.costs)
             print(g.grid)
             tracemalloc.start()
             sv = WellnessSolver(g)

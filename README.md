@@ -83,6 +83,14 @@ You can let the system generate a random grid of specified dimensions
 
 ```
 $ ./gridworld/main.py play --dimensions=7x5
+terrain key with costs (H=health, M=move):
+        | S |    H |    M
+        |---|------|------
+  blank | . |    0 |   -1
+   lava | * |  -50 |  -10
+    mud | # |  -10 |   -5
+speeder | + |   -5 |    0
+        ------------------
   01234
   -----
 0|*#..*|0 <<
