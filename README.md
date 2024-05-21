@@ -18,6 +18,101 @@ $ ./scripts/initialize
 $ ./scripts/build
 ```
 
+### Run
+
+The entrypoint for running from the shell is `gridworld/main.py`.
+
+
+```
+$ ./gridworld/main.py --help
+usage: gridworld [-h] [--dimensions DIMENSIONS] [--grid GRID] [--port PORT] [--servermode SERVERMODE] mode
+
+Gridworld game
+
+positional arguments:
+  mode                  mode for interacting with project ['play', 'server', 'solve']
+
+options:
+  -h, --help            show this help message and exit
+  --dimensions DIMENSIONS
+                        dimensions for the 2-d grid
+  --grid GRID           file to load grid data
+  --port PORT           port to run web server on
+  --servermode SERVERMODE
+                        server mode ['dev', 'prod']
+```
+
+It can be started in one of three modes:
+
+#### Solve mode
+
+Solve mode allows:
+- displaying random grids
+- running a solver on a grid
+
+```
+$ ./gridworld/main.py solve --dimensions=7x5
+*.+#+
+#.#*#
++#.+*
+.**#+
+#*#+*
++**..
+..+.*
+```
+
+This encoding of a grid can then be used via the `--grid` argument.
+
+```
+$ ./gridworld/main.py solve --grid=gridworld/data/grids/solvable-10x10-grid.out 
+```
+
+The solver will attempt to pilot an agent from a start position
+at (0, 0) to a goal position at (m-1, n-1) [bottom-right corner].
+
+*Caveat*:  The solver can handle grids around 20x20 okay, but much larger
+takes several minutes.
+
+#### Play mode
+
+Play mode allows a human to pilot an agent through a grid world
+via text I/O at the shell.
+
+You can let the system generate a random grid of specified dimensions
+(via `--dimensions`) or use a saved grid from a file (via `--grid`).
+
+```
+$ ./gridworld/main.py play --dimensions=7x5
+  01234
+  -----
+0|*#..*|0 <<
+1|..*.#|1
+2|.+**#|2
+3|*+#..|3
+4|...#+|4
+5|..**#|5
+6|*++..|6
+  -----
+  01234
+  ^
+start:   (0, 0)
+goal:    (6, 4)
+agent: @ (0, 0) H:200/200, M:450/450
+== choose direction (u, d, l, r) and hit Enter:
+```
+
+(This feature was not requested but I thought it could be fun.)
+
+#### Server mode
+
+Server mode starts a FastAPI-based API server.
+
+```
+$ ./gridworld/main.py server --port 8001 --servermode dev
+```
+
+API endpoints are described below.
+
 ### Lint
 
 Uses `flake8`.
@@ -114,6 +209,46 @@ solvable for a given grid world level to get from point A to point
 B, and (b) What the most efficient route is to get across if it is
 solvable, in order to minimize health damage and moves it takes to
 get from point A to point B.
+```
+
+## API endpoints
+
+Swagger / OpenAPI interactive descriptions of these endpoints are
+available at:
+```
+http://127.0.0.1:${port}/docs
+```
+
+### GET /games
+
+Returns JSON representation of all games within db.
+
+### GET /games/:game_id
+
+Return JSON representation of specified game if present,
+or 404 otherwise.
+
+### POST /games
+
+Creates a randomly generated game with the specified dimensions.
+
+Request body is JSON of this shape:
+```
+{
+  "dimensions": [5, 10]
+}
+```
+
+Via curl:
+```
+$ curl -v --json '{"dimensions": [2, 2]}' 'http://localhost:8001/games'
+```
+
+Response is JSON:
+```
+{
+  "game_id": 42
+}
 ```
 
 ## Author
