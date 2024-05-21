@@ -69,7 +69,7 @@ async def create_game(
     dims: GridDimensions, repo: GameRepo = Depends(get_game_repo)
 ):
     game_id = repo.create_game(dims.dimensions)
-    return {"game_id": game_id}
+    return JSONResponse(content={"game_id": game_id}, status_code=201)
 
 
 class AgentDirection(BaseModel):
