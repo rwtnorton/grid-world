@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -eu
+
+if [ $# -eq 1 ]; then
+    case "$1" in
+        -h|--help|-?|--usage)
+            echo "usage: $0 game_id"
+            exit 0
+            ;;
+    esac
+fi
+
+PORT="${PORT:-8000}"
+
+exec curl -v "http://localhost:${PORT}/games"

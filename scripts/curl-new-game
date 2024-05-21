@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -eu
+
+if [ $# -eq 1 ]; then
+    case "$1" in
+        -h|--help|-?|--usage)
+            echo "usage: $0 dimensions"
+            echo ""
+            echo "example: ./$0 2x3"
+            exit 0
+            ;;
+    esac
+fi
+
+if [ $# -ne 1 ]; then
+    1>&2 echo "missing required argument"
+    1>&2 echo "usage: $0 dimensions"
+fi
+
+dims="$1"
+json_payload=`echo "$dims" |python3 -c '
+import sys
+import re
+import json
+s = sys.stdin.readline().rstrip()
+r = re.compile(r"\D+")
+dims = list(r.split(s))
+print(json.dumps(dict(dimensions=dims)))
+'`
+
+PORT="${PORT:-8000}"
+
+exec curl -v --json "$json_payload" "http://localhost:${PORT}/games"

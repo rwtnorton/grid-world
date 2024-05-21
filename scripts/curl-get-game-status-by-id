@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -eu
+
+if [ $# -eq 1 ]; then
+    case "$1" in
+        -h|--help|-?|--usage)
+            echo "usage: $0 game_id"
+            exit 0
+            ;;
+    esac
+fi
+
+if [ $# -ne 1 ]; then
+    1>&2 echo "missing required argument"
+    1>&2 echo "usage: $0 game_id"
+fi
+
+game_id="$1"
+
+PORT="${PORT:-8000}"
+
+exec curl -v "http://localhost:${PORT}/games/${game_id}/status"
