@@ -467,3 +467,19 @@ def test_game_speculative_move_good_move():
     # Moved into lava, so health and moves should have both decreased.
     assert moved_agent.health < agent.health
     assert moved_agent.moves < agent.moves
+
+
+def test_game_from_dimensions():
+    start = (0, 0)
+    dims = (2, 3)
+    goal = (1, 2)
+    game = Game.from_dimensions(dims)
+    costs = Costs()
+    agent = Agent(position=start)
+    assert game.start_position == start
+    assert game.goal_position == goal
+    assert game.agent == agent
+    assert game.costs == costs
+    assert game.grid.dimensions == dims
+    terrains = set(Terrain)
+    assert all(c in terrains for c in game.grid.cells)
