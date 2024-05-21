@@ -36,17 +36,9 @@ def test_agent_init_bad_args():
         Agent(pos, max_moves=0)
     assert "non-positive max_moves: 0" in str(max_m_err.value)
     #
-    with pytest.raises(ValueError) as too_lil_health_err:
-        Agent(pos, health=0, max_health=10)
-    assert "invalid health: 0, max=10" in str(too_lil_health_err.value)
-    #
     with pytest.raises(ValueError) as too_big_health_err:
         Agent(pos, health=11, max_health=10)
     assert "invalid health: 11, max=10" in str(too_big_health_err.value)
-    #
-    with pytest.raises(ValueError) as too_lil_moves_err:
-        Agent(pos, moves=0, max_moves=10)
-    assert "invalid moves: 0, max=10" in str(too_lil_moves_err.value)
     #
     with pytest.raises(ValueError) as too_big_moves_err:
         Agent(pos, moves=11, max_moves=10)

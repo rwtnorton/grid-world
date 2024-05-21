@@ -21,11 +21,13 @@ class Agent:
             raise ValueError(f"non-positive max_health: {self.max_health}")
         if self.max_moves <= 0:
             raise ValueError(f"non-positive max_moves: {self.max_moves}")
-        if self.health <= 0 or self.health > self.max_health:
+        # Turns out, we can have non-positive vitals if deserialized
+        # from an ongoing game.
+        if self.health > self.max_health:
             raise ValueError(
                 f"invalid health: {self.health}, max={self.max_health}"
             )
-        if self.moves <= 0 or self.moves > self.max_moves:
+        if self.moves > self.max_moves:
             raise ValueError(
                 f"invalid moves: {self.moves}, max={self.max_moves}"
             )
