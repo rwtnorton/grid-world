@@ -98,7 +98,7 @@ def ruler(s: str, pos: Tuple[int, int]) -> str:
 
 
 def run_game_loop(game: Game):
-    dir_prompt = "== choose direction (u, d, l, r): "
+    dir_prompt = "== choose direction (u, d, l, r) and hit Enter: "
     path = [game.agent.position]
 
     def show_agent_stats():
