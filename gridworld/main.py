@@ -2,6 +2,7 @@
 import argparse
 import re
 import tracemalloc
+from enum import StrEnum
 from typing import Tuple
 
 from gridworld.agent import Agent
@@ -57,10 +58,24 @@ def humansized(n0: int) -> str:
     return f"{x:0.3f} GiB"
 
 
+class Mode(StrEnum):
+    SOLVE = "solve"
+    SERVER = "server"
+    PLAY = "play"
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="gridworld",
         description="Gridworld game",
+    )
+    parser.add_argument(
+        "mode",
+        type=Mode,
+        help=(
+            f"mode for interacting with project "
+            f"{sorted(m.name.lower() for m in Mode)}"
+        ),
     )
     parser.add_argument(
         "--dimensions",
@@ -78,22 +93,26 @@ def main():
         help="file to load grid data",
     )
     args = parser.parse_args()
-    if args.grid is None:
-        dims = args.dimensions
-        g = _some_game(dims=dims)
-    else:
-        with open(args.grid, "r") as f:
-            grid_str = f.read()
-            g = _some_game(grid_str=grid_str)
-    print(g.grid)
-    tracemalloc.start()
-    sv = WellnessSolver(g)
-    got = sv.solve()
-    print(got)
-    mem_pair = tracemalloc.get_traced_memory()
-    print(mem_pair)
-    print([humansized(i) for i in mem_pair])
-    tracemalloc.stop()
+    mode = args.mode
+    # print(f"mode: {mode!r}")
+    match mode:
+        case Mode.SOLVE:
+            if args.grid is None:
+                dims = args.dimensions
+                g = _some_game(dims=dims)
+            else:
+                with open(args.grid, "r") as f:
+                    grid_str = f.read()
+                    g = _some_game(grid_str=grid_str)
+            print(g.grid)
+            tracemalloc.start()
+            sv = WellnessSolver(g)
+            got = sv.solve()
+            print(got)
+            mem_pair = tracemalloc.get_traced_memory()
+            print(mem_pair)
+            print([humansized(i) for i in mem_pair])
+            tracemalloc.stop()
 
 
 if __name__ == "__main__":
