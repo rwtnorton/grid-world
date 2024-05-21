@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import re
+import subprocess
 import tracemalloc
 from enum import StrEnum
 from itertools import repeat
@@ -97,6 +98,27 @@ def ruler(s: str, pos: Tuple[int, int]) -> str:
     return "\n".join(new_rows)
 
 
+class ServerMode(StrEnum):
+    DEV = "dev"
+    PROD = "prod"
+
+
+WEB_PATH = "gridworld/web.py"
+
+
+def run_web_server(port: int = 8000, server_mode: ServerMode = ServerMode.DEV):
+    dev_or_prod = "dev" if server_mode == ServerMode.DEV else "run"
+    cmd = ["fastapi", dev_or_prod, WEB_PATH, "--port", str(port)]
+    print(f"web cmd: {cmd!r}")
+    try:
+        result = subprocess.run(
+            ["fastapi", dev_or_prod, WEB_PATH, "--port", str(port)]
+        )
+    except KeyboardInterrupt:
+        exit(0)
+    exit(result.returncode)
+
+
 def run_game_loop(game: Game):
     dir_prompt = "== choose direction (u, d, l, r) and hit Enter: "
     path = [game.agent.position]
@@ -158,6 +180,22 @@ def main():
         required=False,
         help="file to load grid data",
     )
+    parser.add_argument(
+        "--port",
+        dest="port",
+        type=int,
+        required=False,
+        default="8000",
+        help="port to run web server on",
+    )
+    parser.add_argument(
+        "--servermode",
+        dest="servermode",
+        type=ServerMode,
+        required=False,
+        default="dev",
+        help=f"server mode {sorted(m.name.lower() for m in ServerMode)}",
+    )
     args = parser.parse_args()
     mode = args.mode
     # print(f"mode: {mode!r}")
@@ -176,6 +214,8 @@ def main():
         case Mode.PLAY:
             g = gather_game_from_args(args)
             run_game_loop(g)
+        case Mode.SERVER:
+            run_web_server(port=args.port, server_mode=args.servermode)
 
 
 if __name__ == "__main__":
