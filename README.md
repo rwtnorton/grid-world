@@ -267,6 +267,19 @@ Response is JSON representation of updated game on success.
 See helper curl script [curl-move-dir](./scripts/curl-move-dir)
 for a more convenient way of moving your agent.
 
+### GET /games/:game_id/status
+
+Return JSON representation of the status of a game if present,
+or 404 otherwise.
+
+JSON response look like:
+```
+{
+  "status": $status
+}
+```
+where `$status` is one of `win`, `loss`, or `ongoing`.
+
 ## Author
 
 [Richard W. Norton](mailto:rwtnorton@gmail.com)
