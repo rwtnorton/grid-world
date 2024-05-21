@@ -5,7 +5,9 @@ from pathlib import Path
 class Database:
     def __init__(self, db_path: Path | str = ":memory:"):
         self._db_path = str(db_path)
-        self.conn = sqlite3.connect(str(self._db_path))
+        self.conn = sqlite3.connect(
+            str(self._db_path), check_same_thread=False
+        )
         print(f"connected to {self._db_path}")
         self.ensure_migrations()
 
