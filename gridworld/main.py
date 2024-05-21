@@ -3,10 +3,12 @@ import argparse
 import re
 import tracemalloc
 from enum import StrEnum
+from itertools import repeat
 from typing import Tuple
 
 from gridworld.agent import Agent
 from gridworld.costs import Costs
+from gridworld.direction import Direction
 from gridworld.grid import Grid
 from gridworld.game import Game
 from gridworld.wellness_solver import WellnessSolver
@@ -64,6 +66,70 @@ class Mode(StrEnum):
     PLAY = "play"
 
 
+def gather_game_from_args(args) -> Game:
+    if args.grid is None:
+        dims = args.dimensions
+        return _some_game(dims=dims)
+    with open(args.grid, "r") as f:
+        grid_str = f.read()
+        return _some_game(grid_str=grid_str)
+
+
+def ruler(s: str, pos: Tuple[int, int]) -> str:
+    rows = s.split("\n")
+    # m = len(rows)
+    n = len(rows[0])
+    # print(f'm x n = {m} x {n}')
+    r, c = pos
+    top_rule = "  " + "".join(str(i % 10) for i in range(n))
+    top_bar = "  " + "".join(repeat("-", n))
+    new_rows = [top_rule, top_bar]
+    for i, row_str in enumerate(rows):
+        pointer = " <<" if r == i else ""
+        i %= 10
+        new_rows.append(f"{i}|{row_str}|{i}{pointer}")
+    new_rows.append(top_bar)
+    new_rows.append(top_rule)
+    pointer_buf = list(repeat(" ", n))
+    pointer_buf[c] = "^"
+    bottom_pointer = "  " + "".join(pointer_buf)
+    new_rows.append(bottom_pointer)
+    return "\n".join(new_rows)
+
+
+def run_game_loop(game: Game):
+    dir_prompt = "== choose direction (u, d, l, r): "
+    path = [game.agent.position]
+
+    def show_agent_stats():
+        ag = game.agent
+        print(
+            f"agent: @ {ag.position}"
+            f" H:{ag.health}/{ag.max_health},"
+            f" M:{ag.moves}/{ag.max_moves}"
+        )
+
+    while True:
+        print(ruler(str(game.grid), game.agent.position))
+        print(f"start:   {game.start_position}")
+        print(f"goal:    {game.goal_position}")
+        show_agent_stats()
+        if game.is_win():
+            print("Success!")
+            print(f"path: {path}")
+            exit(0)
+        if game.is_loss():
+            print("Failure!")
+            print(f"path: {path}")
+            exit(0)
+        input_str = input(dir_prompt)
+        d = Direction.from_str(input_str)
+        if not game.move(d):
+            print("Invalid move, enter one of:  u, d, l, r")
+        else:
+            path.append(game.agent.position)
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="gridworld",
@@ -97,13 +163,7 @@ def main():
     # print(f"mode: {mode!r}")
     match mode:
         case Mode.SOLVE:
-            if args.grid is None:
-                dims = args.dimensions
-                g = _some_game(dims=dims)
-            else:
-                with open(args.grid, "r") as f:
-                    grid_str = f.read()
-                    g = _some_game(grid_str=grid_str)
+            g = gather_game_from_args(args)
             print(g.grid)
             tracemalloc.start()
             sv = WellnessSolver(g)
@@ -113,6 +173,9 @@ def main():
             print(mem_pair)
             print([humansized(i) for i in mem_pair])
             tracemalloc.stop()
+        case Mode.PLAY:
+            g = gather_game_from_args(args)
+            run_game_loop(g)
 
 
 if __name__ == "__main__":
