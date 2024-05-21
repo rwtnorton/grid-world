@@ -3,9 +3,12 @@ from typing import Tuple
 
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from gridworld import direction
 from pydantic import BaseModel
 
 from gridworld.database import Database
+from gridworld.direction import Direction
+from gridworld.game import Game
 from gridworld.game_repo import GameRepo
 
 app = FastAPI()
@@ -64,7 +67,7 @@ async def get_game_by_id(
 ):
     game_maybe = repo.get_game_by_id(game_id)
     if game_maybe is None:
-        raise HTTPException(status_code=404, detail="Game not found")
+        raise HTTPException(status_code=404, detail="game not found")
     return JSONResponse(content=json.loads(game_maybe.to_json_str()))
 
 
@@ -80,10 +83,28 @@ async def create_game(
     return {"game_id": game_id}
 
 
-#
-# @app.put("/games/{game_id}")
-# async def create_game(
-#     dims: GridDimensions, repo: GameRepo = Depends(get_game_repo)
-# ):
-#     game_id = repo.create_game(dims.dimensions)
-#     return {"game_id": game_id}
+class AgentDirection(BaseModel):
+    direction: str
+
+
+@app.put("/games/{game_id}/direction")
+async def update_agent_direction(
+    game_id: int,
+    agent_dir: AgentDirection,
+    repo: GameRepo = Depends(get_game_repo),
+):
+    game_maybe = repo.get_game_by_id(game_id)
+    if game_maybe is None:
+        raise HTTPException(status_code=404, detail="game not found")
+    game: Game = game_maybe  # better name, no maybe
+    try:
+        d = Direction.from_str(agent_dir.direction)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"invalid direction: {agent_dir.direction}",
+        )
+    if game.move(d):
+        repo.update_game_by_id(game_id, game)
+        return JSONResponse(content=json.loads(game.to_json_str()))
+    return {"message": f"direction had no effect: {agent_dir.direction}"}

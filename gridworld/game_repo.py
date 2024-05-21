@@ -52,5 +52,6 @@ class GameRepo:
         json_str = game.to_json_str()
         cursor = self.db.conn.cursor()
         res = cursor.execute(update_game_sql, (json_str, game_id))
+        self.db.conn.commit()
         cursor.close()
         return res.rowcount == 1

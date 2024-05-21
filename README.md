@@ -251,6 +251,22 @@ Response is JSON:
 }
 ```
 
+### PUT /games/:game_id/direction
+
+Updates game by attempting to move agent in specified direction.
+
+Request body is JSON of this shape:
+```
+{
+  "direction": "D"
+}
+```
+
+Response is JSON representation of updated game on success.
+
+See helper curl script [curl-move-dir](./scripts/curl-move-dir)
+for a more convenient way of moving your agent.
+
 ## Author
 
 [Richard W. Norton](mailto:rwtnorton@gmail.com)

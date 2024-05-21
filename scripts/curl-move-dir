@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -eu
+
+if [ $# -eq 1 ]; then
+    case "$1" in
+        -h|--help|-?|--usage)
+            echo "usage: $0 game_id direction"
+            exit 0
+            ;;
+    esac
+fi
+
+if [ $# -ne 2 ]; then
+    1>&2 echo "missing required arguments"
+    1>&2 echo "usage: $0 game_id direction"
+fi
+
+game_id="$1"
+direction="$2"
+
+PORT="${PORT:-8000}"
+
+exec curl -v -X 'PUT' \
+    "http://127.0.0.1:${PORT}/games/${game_id}/direction" \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d "{
+  \"direction\": \"${direction}\"
+}"
