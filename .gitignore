@@ -7,3 +7,4 @@ gridworld.egg-info/
 .tox/
 *.sw[op]
 __pycache__
+*.sqlite3

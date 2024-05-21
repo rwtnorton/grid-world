@@ -59,6 +59,22 @@ class Game:
             goal_position=(goal_pos[0], goal_pos[1]),
         )
 
+    @classmethod
+    def from_dimensions(cls, dimensions: Tuple[int, int]) -> "Game":
+        m, n = dimensions
+        grid = Grid.random(dimensions)
+        start = (0, 0)
+        goal = (m - 1, n - 1)
+        agent = Agent(position=start)
+        costs = Costs()
+        return cls(
+            grid=grid,
+            agent=agent,
+            costs=costs,
+            start_position=start,
+            goal_position=goal,
+        )
+
     def is_win(self) -> bool:
         return (
             self.agent.position == self.goal_position and self.agent.is_alive()

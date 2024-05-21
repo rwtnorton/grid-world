@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import os.path
 import re
 import subprocess
 import tracemalloc
@@ -103,11 +104,10 @@ class ServerMode(StrEnum):
     PROD = "prod"
 
 
-WEB_PATH = "gridworld/web.py"
+WEB_PATH = os.path.join("gridworld", "web.py")
 
 
 def run_web_server(port: int = 8000, server_mode: ServerMode = ServerMode.DEV):
-    fastapi_subcmd = None
     match server_mode:
         case ServerMode.DEV:
             fastapi_subcmd = "dev"
